@@ -40,7 +40,7 @@ begin
         end if;
     end process Resetter;
 
-    state_transition : process (dollar, quarter)
+    state_transition : process (dollar, quarter, state)
     begin                           --?????s1s2??????????
         case state is
             when s1 =>

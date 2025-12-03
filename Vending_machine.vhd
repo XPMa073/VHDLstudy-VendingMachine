@@ -7,30 +7,31 @@ entity Vending_machine is
     port (
         clk     : in  STD_LOGIC;
         reset   : in  STD_LOGIC;
-        dollar  : in  STD_LOGIC;    --????1?
-        quarter : in  STD_LOGIC;    --????5?
-        change  : out STD_LOGIC;    --??5?
-        drink   : out STD_LOGIC     --????
+        dollar  : in  STD_LOGIC;    --+1.0
+        quarter : in  STD_LOGIC;    --+0.5
+        change  : out STD_LOGIC;
+        drink   : out STD_LOGIC
     );
 end entity Vending_machine;
 
 architecture Behavioral of Vending_machine is
+    
+    constant s0 : std_logic_vector(2 downto 0) := "000";    --idle
+    constant s1 : std_logic_vector(2 downto 0) := "001";    --0.5
+    constant s2 : std_logic_vector(2 downto 0) := "010";    --1.0
+    constant s3 : std_logic_vector(2 downto 0) := "011";    --1.5
+    constant s4 : std_logic_vector(2 downto 0) := "100";    --2.0
+    constant s5 : std_logic_vector(2 downto 0) := "101";    --empty
+    constant s6 : std_logic_vector(2 downto 0) := "110";    --empty
+    constant s7 : std_logic_vector(2 downto 0) := "111";    --empty
 
-    type state_type is (s0,         --idle
-                        s1,         --0.5
-                        s2,         --1.0
-                        s3,         --1.5
-                        s4,         --2.0
-                        s5,         --empty
-                        s6,         --empty
-                        s7);        --empty
-    signal state, nextstate : state_type;
+    signal state, nextstate : std_logic_vector(2 downto 0);
 
 
 begin
 
     Resetter : process(clk, reset)
-    begin                           --????????????
+    begin                           --reset
         if reset = '0' then
             state <= s0;
         elsif (clk'event and clk ='1') then
@@ -41,7 +42,7 @@ begin
     end process Resetter;
 
     state_transition : process (dollar, quarter, state)
-    begin                           --?????s1s2??????????
+    begin
         case state is
             when s1 =>
                 if dollar = '1' then
@@ -61,7 +62,7 @@ begin
                     nextstate <= s2;
                 end if;
 
-            when others =>          --?????s0
+            when others =>          --the nextstate of other states is the same as s0
                 if dollar = '1' then
                     nextstate <= s2;
                 elsif quarter = '1' then
@@ -81,7 +82,7 @@ begin
             when s4 =>
                 change <= '1' ;
                 drink  <= '1' ;
-            when others =>          --??s3s4???
+            when others =>          --no output other than s3,s4
                 change <= '0' ;
                 drink  <= '0' ;
         end case;
